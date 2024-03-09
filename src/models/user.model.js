@@ -18,7 +18,7 @@ email:{
     trim:true,
     lowercase:true,
 },
-fulname:{
+fullname:{
     type:String,
     required:true,
     trim:true,
@@ -43,13 +43,13 @@ password:{
     unique:true,
 
 },
-refreshTokem:{
+refreshToken:{
     type:String
 }
 },{timestamps:true})
 userScheema.pre("save",async function (next){
     if (this.isModified("password")) return next();
-     this.password=bcrypt.hash(this.password,10);
+     this.password=await bcrypt.hash(this.password,10);
     next();
 })
 userScheema.methods.isPasswordCorrect=async function (password) {
