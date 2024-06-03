@@ -7,7 +7,7 @@ const storage = multer.diskStorage({
     filename: function (req, file, cb) {
       cb(null, file.originalname) // Rename the file to prevent naming conflicts
     }
-  });
+  })
   
   // Initialize Multer upload middleware
   export const upload = multer({ storage: storage });

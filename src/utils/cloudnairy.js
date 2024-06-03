@@ -1,10 +1,12 @@
 import { v2 as cloudinary } from "cloudinary";
-import fs from "fs"    
+import fs from "fs"
+import dotenv from "dotenv"
+dotenv.config()
 cloudinary.config({ 
   cloud_name: "dj0k9z7tr",//process.env.CLOUDINARY_CLOUD_NAME, 
   api_key:"994816924895392", //process.env.CLOUDINARY_API_KEY, 
   api_secret:"OaF0Z7YZcCryD4B8-RecKsWPBng" //process.env.CLOUDINARY_API_SECRET 
-});
+})
 
 
 const uploadOnCludinary=async (localFilePath)=>{
@@ -13,11 +15,12 @@ const uploadOnCludinary=async (localFilePath)=>{
         const response=await cloudinary.uploader.upload(localFilePath,{
             resource_type:"auto"
         })
-        //file is uploaded
-        console.log("file is uploaded on cloudinary successfully ",response.url)
+        
+        fs.unlinkSync(localFilePath)
         return response;
     } catch (error) {
         fs.unlinkSync(localFilePath) //remove the locally sved file
+        console.log("error while uploading files",error)
         return null;
     }
 }
