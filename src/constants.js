@@ -1,3 +1,3 @@
-const DB_NAME="youtube"
+const DB_NAME="mernblog"
 
 export default DB_NAME
