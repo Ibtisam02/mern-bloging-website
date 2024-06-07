@@ -1,18 +1,19 @@
-import dotenv from "dotenv"
-import connectDB from "./db/connection.js";
-import { app } from "./app.js";
-dotenv.config({
-    path:"./.env"
-})
+import express from "express"
+import cookieParser from "cookie-parser"
+import cors from "cors"
 
+const app=express()
+app.use(cors({
+    origin:process.env.CORS_ORIGEN,//,http://localhost:5173
+    credentials:true
+}))
+app.use(express.json({limit:"16kb"}))
+app.use(express.urlencoded({extended:true,limit:"16kb"}))
+app.use(express.static("public"))
+app.use(cookieParser())
+import userRouter from "./routes/user.routes.js"
+app.use("/",userRouter)
+//import userRouter from "./routes/user.rutes.js"
 
-connectDB()
-.then(()=>{
-    app.on("error",(error)=>{
-        console.log(`thsi is connection error`,error)
-    })
-    app.listen(process.env.PORT||8000,()=>{
-        console.log("app is listning on port no "+process.env.PORT)
-    })
-})
-.catch(error=>console.log(`errror while connecting mongodb `,error))
+app.use("/api/v1/users",userRouter)
+export {app}
