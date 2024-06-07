@@ -1,4 +1,5 @@
 import { Post } from "../models/post.model.js";
+import { Comment } from "../models/coments.model.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { uploadOnCludinary } from "../utils/cloudnairy.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -102,7 +103,7 @@ const createPost=(async(req,res)=>{
         catagor:catagor,
         subCatagor:subCatagor
     })
-    res.status(200).json(new ApiResponse(200,post,"user created successfully"))
+    res.status(200).json(new ApiResponse(200,post,"post created successfully"))
     } catch (error) {
         console.log("error in create post ", error)
     }
@@ -112,9 +113,35 @@ const getPosts=async(req,res)=>{
     const posts= await Post.find({privat:false})
     return res.status(200).json(new ApiResponse(200,posts,"posts ftched successfully"))
 }
+const getPrivatePosts=async(req,res)=>{
+    const posts= await Post.find({privat:true})
+    return res.status(200).json(new ApiResponse(200,posts,"posts ftched successfully"))
+}
 const getOnePost=async(req,res)=>{
     const {id}=req.params;
-    const post=await Post.findById({_id:id});
+    const prepost=await Post.findById({_id:id});
+    if(!prepost){
+        return res.json({
+            error:"post not found"
+        })
+    }
+
+    const post=await Post.aggregate([
+        {
+             $match: { $expr : { $eq: [ '$_id' , { $toObjectId: id } ] } } 
+        },
+        {
+            $lookup: {
+              from: "comments",
+              localField: "_id",
+              foreignField: "post",
+              as: "comments"
+            }
+          }
+    ])
+    if (!post) {
+        console.log("no")
+    }
     return res.status(200).json(new ApiResponse(200,post,"post fetched"))
 }
 const addCatagory=async(req,res)=>{
@@ -150,13 +177,20 @@ const registerUser=async(req,res)=>{
     const {name,email,username,password}=req.body;
 
     if ([name,email,username,password].some((item)=>item.trim()=="")) {
-        throw new ApiError(401,"All fields are required")
+        //throw new ApiError(401,"All fields are required")
+        return res.json({
+            error:"All fields are required"
+        })
     }
     const isUserExisted=await Register.findOne({
         $or:[{email:email},{username:username}]
     })
+    
     if (isUserExisted) {
-        throw new ApiError(409,"username or email already exist");
+        //throw new ApiError(409,"username or email already exist");
+        return res.json({
+            error:"username or email already exist"
+        })
     }
     const user=await Register.create({
         name:name,
@@ -167,7 +201,10 @@ const registerUser=async(req,res)=>{
 
     const isUserCreated=await Register.findById(user._id).select({password:0,refreshToken:0})
     if (!isUserCreated) {
-        throw new ApiError(500,"Somthing went wrong while registring user");
+        //throw new ApiError(500,"Somthing went wrong while registring user");
+        return res.json({
+            error:"Somthing went wrong while registring user"
+        })
     }
 
     return res.status(200).json(new ApiResponse(200,isUserCreated,"user created successfully"))
@@ -210,6 +247,65 @@ const deletePost=async(req,res)=>{
         success:"Post deleted"
     })
 }
+const changePostPrivacy=async(req,res)=>{
+    const {id}=req.params;
+    let checkPost=await Post.findOne({_id:id})
+    if (!checkPost) {
+        return res.json({
+            error:"post dose not exixt"
+        })
+    }
+    if (checkPost.privat==true) {
+        
+        let post=await Post.updateOne({_id:id},{$set:{privat:false}})
+        return res.status(200).json(new ApiResponse(200,post,"post set to public"))
+    }
+    let post=await Post.updateOne({_id:id},{$set:{privat:true}})
+        return res.status(200).json(new ApiResponse(200,post,"post set to private"))
+    
+}
+const addComment=async(req,res)=>{
+    const {name,text,post}=req.body;
+    if ([name,text,post].some((item)=>item.trim()=="")) {
+        //throw new ApiError(401,"All fields are required")
+        return res.json({
+            error:"All fields are required"
+        })
+    }
+    const comment=await Comment.create({
+        name:name.toLowerCase(),
+        comment:text,
+        post:post
+    })
+    const isCommentAdded=await Comment.findById(comment._id);
+    if (!isCommentAdded) {
+        return res.json({
+            error:"coment is not added"
+        })
+    }
+    return res.status(200).json(new ApiResponse(200,isCommentAdded,"comment added successfully"));
+}
+const getPostThroughCatagory=async(req,res)=>{
+    const {catagory}=req.body;
+    if (catagory=="") {
+        return res.json({
+            error:"please add catagory"
+        })
+    }
+    const posts=await Post.find({$and:[{catagor:catagory},{privat:false}]})
+    return res.status(200).json(new ApiResponse(200,posts,"posts fetched successfully"));
+}
+const getPostThroughSubCatagory=async(req,res)=>{
+    const {subCatagory}=req.body;
+    if (subCatagory=="") {
+        return res.json({
+            error:"please add catagory"
+        })
+    }
+    const posts=await Post.find({$and:[{subCatagor:subCatagory},{privat:false}]})
+    console.log(posts)
+    return res.status(200).json(new ApiResponse(200,posts,"posts fetched successfully"));
+}
 
 export {
     createPost,
@@ -223,7 +319,12 @@ export {
     loginUser,
     varifyJwt,
     varifyAdmin,
-    deletePost
+    deletePost,
+    addComment,
+    getPostThroughCatagory,
+    getPostThroughSubCatagory,
+    getPrivatePosts,
+    changePostPrivacy
 }
 
 

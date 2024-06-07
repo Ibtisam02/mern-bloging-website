@@ -25,5 +25,7 @@ router.patch("./avatar",varifyJwt,upload.single("avatar"),updateUserAvatar)
 router.patch("./cover-image",varifyJwt,upload.single("coverImage"),updateUserCover)
 router.get("/c/:username",varifyJwt,getUserChannelProfile)
 router.get("/history",varifyJwt,getWatchHistory)
+router.get("/history",varifyJwt,getWatchHistory)
+router.get("/history",varifyJwt,getWatchHistory)
 
 export default router
