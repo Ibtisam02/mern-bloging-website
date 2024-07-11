@@ -236,7 +236,7 @@ const loginUser=async(req,res)=>{
         httpOnly:true,
         secure:true
     }
-    return res.status(200).cookie("accessToken",accessToken,options).cookie("refreshToken",refreshToken,options).json(new ApiResponse(200,{user:logedInUser,refreshToken,accessToken}))
+    return res.status(200).cookie("accessToken",accessToken).cookie("refreshToken",refreshToken,).json(new ApiResponse(200,{user:logedInUser,refreshToken,accessToken}))
 
 }
 const deletePost=async(req,res)=>{
