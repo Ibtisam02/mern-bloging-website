@@ -234,8 +234,9 @@ const loginUser=async(req,res)=>{
     const logedInUser=await Register.findById(user._id).select({password:0,refreshToken:0})
     const options={
         httpOnly:true,
-        secure:true
+        expires:new Date(Date.now()+process.env.ACCESS_TOKEN_EXPIRY*24*60*60*1000),
     }
+    console.log(options.expires)
     return res.status(200).cookie("accessToken",accessToken,options).cookie("refreshToken",refreshToken,options).json(new ApiResponse(200,{user:logedInUser,refreshToken,accessToken}))
 
 }
