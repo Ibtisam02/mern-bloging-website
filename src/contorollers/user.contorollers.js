@@ -235,6 +235,7 @@ const loginUser=async(req,res)=>{
     const options={
         httpOnly:true,
         expires:new Date(Date.now()+process.env.ACCESS_TOKEN_EXPIRY*24*60*60*1000),
+     secure:true,
     }
     console.log(options.expires)
     return res.status(200).cookie("accessToken",accessToken,options).cookie("refreshToken",refreshToken,options).json(new ApiResponse(200,{user:logedInUser,refreshToken,accessToken}))
