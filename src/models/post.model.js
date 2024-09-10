@@ -30,7 +30,6 @@ const postScheems=new mongoose.Schema({
         type:Boolean,
         required:true
     },
-
-})
+},{timestamps:true})
 
 export const Post=mongoose.model("Post",postScheems);

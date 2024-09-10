@@ -113,6 +113,10 @@ const getPosts=async(req,res)=>{
     const posts= await Post.find({privat:false})
     return res.status(200).json(new ApiResponse(200,posts,"posts ftched successfully"))
 }
+const getSortedPosts=async(req,res)=>{
+    const posts= await Post.find({privat:false}).sort({createdAt:-1}).limit(6)
+    return res.status(200).json(new ApiResponse(200,posts,"posts ftched successfully"))
+}
 const getPrivatePosts=async(req,res)=>{
     const posts= await Post.find({privat:true})
     return res.status(200).json(new ApiResponse(200,posts,"posts ftched successfully"))
@@ -169,6 +173,7 @@ const getCatagories=async(req,res)=>{
     const data=await Catagory.find();
     return res.status(200).json(new ApiResponse(200,data,"catagoies fetched successfully"))
 }
+
 const getSubCatagories=async(req,res)=>{
     const data= await subCatagoryModel.find();
     return res.status(200).json(new ApiResponse(200,data,"sub Catagoies fetched successfully"))
@@ -325,7 +330,9 @@ export {
     getPostThroughCatagory,
     getPostThroughSubCatagory,
     getPrivatePosts,
-    changePostPrivacy
+    changePostPrivacy,
+    getSortedPosts
+
 }
 
 

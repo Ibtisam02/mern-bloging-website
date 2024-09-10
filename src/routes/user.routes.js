@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { addCatagory, addSubCatagory, createPost, getCatagories, getOnePost, getPosts, getSubCatagories,registerUser,loginUser,varifyJwt,varifyAdmin, deletePost,addComment,getPostThroughCatagory,getPostThroughSubCatagory, getPrivatePosts,changePostPrivacy } from "../contorollers/user.contorollers.js";
+import { addCatagory, addSubCatagory, createPost, getCatagories, getOnePost, getPosts, getSubCatagories,registerUser,loginUser,varifyJwt,varifyAdmin, deletePost,addComment,getPostThroughCatagory,getPostThroughSubCatagory, getPrivatePosts,changePostPrivacy, getSortedPosts } from "../contorollers/user.contorollers.js";
 import {upload} from "../middlewares/multer.middleware.js"
 import { ApiResponse } from "../utils/ApiResponse.js";
 
@@ -24,5 +24,7 @@ router.post("/get-through-catagory",getPostThroughCatagory)
 router.post("/get-through-sub-catagory",getPostThroughSubCatagory)
 router.get("/get-private-posts",varifyJwt,varifyAdmin,getPrivatePosts)
 router.get("/change-post-privacy/:id",varifyJwt,varifyAdmin,changePostPrivacy)
+router.get("/sorted-posts",getSortedPosts)
+registerUser
 
 export default router
